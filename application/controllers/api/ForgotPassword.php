@@ -28,7 +28,7 @@ class ForgotPassword extends REST_Controller
             $errorString = implode(",", $this->form_validation->error_array());
             $response['message'] = $errorString;
         } else {
-            $checkUser = $this->QueryModel->selectSingelRecord('users', array('email' => $this->input->post('email')));
+            $checkUser = $this->QueryModel->selectSingleRecord('users', array('email' => $this->input->post('email')));
             if ($checkUser) {
                 $otp = rand(000000, 999999);
                 $subject = 'OCR - Reset Password';
@@ -74,9 +74,9 @@ class ForgotPassword extends REST_Controller
             $errorString = implode(",", $this->form_validation->error_array());
             $response['message'] = $errorString;
         } else {
-            $checkUser = $this->QueryModel->selectSingelRecord('users', array('email' => $this->input->post('email')));
+            $checkUser = $this->QueryModel->selectSingleRecord('users', array('email' => $this->input->post('email')));
             if ($checkUser) {
-                $checkOTP = $this->QueryModel->selectSingelRecord('users', array('forgot_pass_otp' => $this->input->post('otp')));
+                $checkOTP = $this->QueryModel->selectSingleRecord('users', array('forgot_pass_otp' => $this->input->post('otp')));
                 if ($checkOTP) {
                     $response['status'] = API_SUCCESS;
                     $response['message'] = "Successfull";
@@ -108,14 +108,14 @@ class ForgotPassword extends REST_Controller
             $response['message'] = $errorString;
         } else {
             $data = array();
-            $checkUser = $this->QueryModel->selectSingelRecord('users', array('email' => $this->input->post('email')));
+            $checkUser = $this->QueryModel->selectSingleRecord('users', array('email' => $this->input->post('email')));
             if ($checkUser) {
                 $data['password'] = $this->QueryModel->passwordHash($this->input->post('password'));
                 $data['forgot_pass_otp'] = '';
                 $update_password = $this->QueryModel->updateRecord('users', $data, array('email' => $this->input->post('email')));
                 if ($update_password) {
                     $response['status'] = API_SUCCESS;
-                    $response['message'] = "Password changed Successfull";
+                    $response['message'] = "Password changed successfully.";
                 } else {
                     $response['status'] = API_ERROR;
                     $response['message'] = "Invalid OTP!";

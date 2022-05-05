@@ -30,7 +30,7 @@ class Authentication extends REST_Controller
         } else {
             $data = array();
 
-            $checkUser = $this->QueryModel->selectSingelRecord('users', array('email' => $this->input->post('email')));
+            $checkUser = $this->QueryModel->selectSingleRecord('users', array('email' => $this->input->post('email')));
             if ($checkUser) {
                 if (password_verify($this->input->post('password'), $checkUser['password'])) {
                     $blank_otp = $this->QueryModel->updateRecord('users', array('forgot_pass_otp' => ''), array('email' => $this->input->post('email')));

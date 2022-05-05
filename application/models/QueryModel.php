@@ -115,7 +115,7 @@ class QueryModel extends CI_Model
         }
     }
 
-    function selectSingelRecord($tbl_name, $where)
+    function selectSingleRecord($tbl_name, $where)
     {
         $this->db->select('*');
         if ($where != "") {

@@ -30,7 +30,7 @@ class Login extends REST_Controller
             $response['message'] = $errorString;
         } else {
             $data = array();
-            $checkUser = $this->QueryModel->selectSingelRecord('users', array('email' => $this->input->post('email')));
+            $checkUser = $this->QueryModel->selectSingleRecord('users', array('email' => $this->input->post('email')));
             if ($checkUser) {
                 if (password_verify($this->input->post('password'), $checkUser['password'])) {
                     $userInfo = $this->QueryModel->selectSelectedSingelRecord('users', array('email' => $this->input->post('email')), 'id,name,email,mobile');
