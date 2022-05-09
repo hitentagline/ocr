@@ -197,6 +197,20 @@ class QueryModel extends CI_Model
         return $record->result_array();
     }
 
+    function selectSelectedMultipleRecord($tbl_name, $where, $columns = '*', $orderBy = '')
+    {
+        $this->db->select($columns);
+        if ($where != "") {
+            $this->db->where($where);
+        }
+        if ($orderBy != "") {
+            $this->db->order_by($orderBy);
+        }
+        $this->db->from($tbl_name);
+        $record = $this->db->get();
+        return $record->result_array();
+    }
+
     function selectMultipleRecordFilter($tbl_name, $where = '', $orderBy = '', $start = '', $limit = '')
     {
         $this->db->select('*');

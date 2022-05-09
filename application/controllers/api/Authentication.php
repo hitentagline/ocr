@@ -39,6 +39,7 @@ class Authentication extends REST_Controller
                     $response['message'] = "Login successfully.";
                     $response['userInfo'] = $userInfo;
                 } else {
+                    $response['status'] = API_ERROR;
                     $response['message'] = "Invalid password!";
                 }
             } else {
