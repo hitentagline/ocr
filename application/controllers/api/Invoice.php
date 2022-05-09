@@ -150,24 +150,36 @@ class Invoice extends REST_Controller
     {
         $response = array();
         $this->form_validation->set_rules('user_id', 'User id', 'trim|required');
-        $this->form_validation->set_rules('filter', 'Filter', 'trim|required');
 
         if ($this->form_validation->run() == FALSE) {
             $response['status'] = FORM_VALIDATION_ERROR;
             $errorString = implode(",", $this->form_validation->error_array());
             $response['message'] = $errorString;
         } else {
-            if ($this->input->post('filter') == 'all') {
-                $filterData = $this->QueryModel->selectSelectedMultipleRecord('invoices', array('user_id' => $this->input->post('user_id')), 'id,user_id,company,invoice_no,due_date,total', 'due_date ASC');
-            } else  if ($this->input->post('filter') == 'upcoming') {
-                $start_date = date('Y-m-d');
-                $end_date = date('Y-m-d', strtotime("+30 days"));
-                $filterData = $this->QueryModel->selectSelectedMultipleRecord('invoices', array('user_id' => $this->input->post('user_id'), 'due_date>' =>  $start_date, 'due_date<=' => $end_date), 'id,user_id,company,invoice_no,due_date,total', 'due_date ASC');
+            $filterData = $this->QueryModel->selectSelectedMultipleRecord('invoices', array('user_id' => $this->input->post('user_id')), 'id,user_id,company,invoice_no,due_date,total', 'due_date ASC');
+
+            $start_date = date('Y-m-d');
+            $end_date = date('Y-m-d', strtotime("+30 days"));
+            $list = array();
+            foreach ($filterData as $fd) {
+                $list['id'] = $fd['id'];
+                $list['user_id'] = $fd['user_id'];
+                $list['company'] = $fd['company'];
+                $list['invoice_no'] = $fd['invoice_no'];
+                $list['due_date'] = $fd['due_date'];
+                $list['total'] = $fd['total'];
+                $list['upcoming'] = 0;
+                if ($fd['due_date'] > $start_date && $fd['due_date'] <= $end_date) {
+                    $list['upcoming'] = 1;
+                }
+
+                $data[] = $list;
             }
+
             if ($filterData) {
                 $response['status'] = API_SUCCESS;
                 $response['message'] = "List found successfully.";
-                $response['invoiceData'] = $filterData;
+                $response['invoiceData'] = $data;
             } else {
                 $response['status'] = API_ERROR;
                 $response['message'] = "No one bill found!";
