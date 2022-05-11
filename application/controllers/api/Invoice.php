@@ -27,6 +27,8 @@ class Invoice extends REST_Controller
         $this->form_validation->set_rules('due_date', 'Due date', 'trim|required');
         $this->form_validation->set_rules('total', 'Total', 'trim|required');
 
+        $date = str_replace('/', '-', $this->input->post('due_date'));
+        $due_date =  date('Y-m-d', strtotime($date));
 
         if ($this->form_validation->run() == FALSE) {
             $response['status'] = FORM_VALIDATION_ERROR;
@@ -36,7 +38,7 @@ class Invoice extends REST_Controller
             $data = array();
             $data['company'] =  $this->input->post('company');
             $data['invoice_no'] =  $this->input->post('invoice_no');
-            $data['due_date'] =  date('Y-m-d', strtotime($this->input->post('due_date')));
+            $data['due_date'] =  $due_date;
             $data['total'] =  $this->input->post('total');
             $data['user_id'] =  $this->input->post('user_id');
 
@@ -69,7 +71,8 @@ class Invoice extends REST_Controller
         $this->form_validation->set_rules('due_date', 'Due date', 'trim|required');
         $this->form_validation->set_rules('total', 'Total', 'trim|required');
         $this->form_validation->set_rules('user_id', 'User id', 'trim|required');
-
+        $date = str_replace('/', '-', $this->input->post('due_date'));
+        $due_date =  date('Y-m-d', strtotime($date));
 
         if ($this->form_validation->run() == FALSE) {
             $response['status'] = FORM_VALIDATION_ERROR;
@@ -79,7 +82,7 @@ class Invoice extends REST_Controller
             $data = array();
             $data['company'] =  $this->input->post('company');
             $data['total'] =  $this->input->post('total');
-            $data['due_date'] =  $this->input->post('due_date');
+            $data['due_date'] =  $due_date;
             $data['invoice_no'] =  $this->input->post('invoice_no');
             $data['user_id'] =  $this->input->post('user_id');
             $checkInvoice = $this->QueryModel->selectSingleRecord('invoices', array('id' => $this->input->post('invoice_id')));
