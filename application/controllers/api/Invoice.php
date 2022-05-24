@@ -23,9 +23,12 @@ class Invoice extends REST_Controller
         $response = array();
         $this->form_validation->set_rules('user_id', 'User id', 'trim|required');
         $this->form_validation->set_rules('company', 'Company', 'trim|required');
-        $this->form_validation->set_rules('invoice_no', 'Invoice number', 'trim|required|is_unique[invoices.invoice_no]');
+        $this->form_validation->set_rules('invoice_no', 'Invoice number', 'trim|required');
         $this->form_validation->set_rules('due_date', 'Due date', 'trim|required');
         $this->form_validation->set_rules('total', 'Total', 'trim|required');
+
+        // $this->form_validation->set_message('is_unique', 'This %s is already exist.');
+
 
         $date = str_replace('/', '-', $this->input->post('due_date'));
         $due_date =  date('Y-m-d', strtotime($date));
@@ -35,22 +38,28 @@ class Invoice extends REST_Controller
             $errorString = implode(",", $this->form_validation->error_array());
             $response['message'] = $errorString;
         } else {
-            $data = array();
-            $data['company'] =  $this->input->post('company');
-            $data['invoice_no'] =  $this->input->post('invoice_no');
-            $data['due_date'] =  $due_date;
-            $data['total'] =  $this->input->post('total');
-            $data['user_id'] =  $this->input->post('user_id');
-
-            $invoice = $this->QueryModel->insertRecord('invoices', $data);
-            if ($invoice) {
-                $userInfo = $this->QueryModel->selectSelectedSingelRecord('invoices', array('id' => $invoice), 'id,company,invoice_no,due_date,total');
-                $response['status'] = API_SUCCESS;
-                $response['message'] = "Created successfully.";
-                $response['userInfo'] = $userInfo;
-            } else {
+            $checkInvoice = $this->QueryModel->selectSingleRecord('invoices', array('invoice_no' => $this->input->post('invoice_no'), 'user_id' => $this->input->post('user_id')));
+            if ($checkInvoice) {
                 $response['status'] = API_ERROR;
-                $response['message'] = "Something went wrong!";
+                $response['message'] = "This Invoice number is already exist.";
+            } else {
+                $data = array();
+                $data['company'] =  $this->input->post('company');
+                $data['invoice_no'] =  $this->input->post('invoice_no');
+                $data['due_date'] =  $due_date;
+                $data['total'] =  $this->input->post('total');
+                $data['user_id'] =  $this->input->post('user_id');
+
+                $invoice = $this->QueryModel->insertRecord('invoices', $data);
+                if ($invoice) {
+                    $userInfo = $this->QueryModel->selectSelectedSingelRecord('invoices', array('id' => $invoice), 'id,company,invoice_no,due_date,total');
+                    $response['status'] = API_SUCCESS;
+                    $response['message'] = "Created successfully.";
+                    $response['userInfo'] = $userInfo;
+                } else {
+                    $response['status'] = API_ERROR;
+                    $response['message'] = "Something went wrong!";
+                }
             }
         }
         $this->response($response);
@@ -87,7 +96,7 @@ class Invoice extends REST_Controller
             $data['user_id'] =  $this->input->post('user_id');
             $checkInvoice = $this->QueryModel->selectSingleRecord('invoices', array('id' => $this->input->post('invoice_id')));
             if ($checkInvoice) {
-                $checkInvoiceNo = $this->QueryModel->selectSingleRecord('invoices', array('id!=' => $this->input->post('invoice_id'), 'invoice_no' => $this->input->post('invoice_no')));
+                $checkInvoiceNo = $this->QueryModel->selectSingleRecord('invoices', array('id!=' => $this->input->post('invoice_id'), 'invoice_no' => $this->input->post('invoice_no'), 'user_id' => $this->input->post('user_id')));
                 if ($checkInvoiceNo) {
                     $response['status'] = API_ERROR;
                     $response['message'] = "Invoice number aleready exist in another invoice!";

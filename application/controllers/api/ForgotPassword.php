@@ -15,6 +15,21 @@ class ForgotPassword extends REST_Controller
     }
 
     /**
+     * Generate 6 digit OTP Using this Method. 
+     *
+     * @return Response
+     */
+    public function generate_otp()
+    {
+        $otp = random_int(100000, 999999);
+        if (strlen($otp) < 6) {
+            $this->generate_otp();
+        } else {
+            return $otp;
+        }
+    }
+
+    /**
      * Send OTP Mail For Forgot Password Using this Method. 
      *
      * @return Response
@@ -30,7 +45,8 @@ class ForgotPassword extends REST_Controller
         } else {
             $checkUser = $this->QueryModel->selectSingleRecord('users', array('email' => $this->input->post('email')));
             if ($checkUser) {
-                $otp = rand(000000, 999999);
+                $otp = $this->generate_otp();
+                //otp = random_int(100000, 999999);
                 $subject = 'OCR - Reset Password';
                 $from = $this->config->item('smtp_user');
                 $this->email->set_newline("\r\n");
